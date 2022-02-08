@@ -95,4 +95,9 @@ data "google_iam_policy" "project" {
 resource "google_project_iam_policy" "project" {
   project     = google_project.project.project_id
   policy_data = data.google_iam_policy.project.policy_data
+
+  # Make sure all the APIs are enabled as they add auto-created users that might be needed in the policy
+  depends_on = [
+    google_project_service.project
+  ]
 }
