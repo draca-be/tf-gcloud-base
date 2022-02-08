@@ -28,7 +28,7 @@ data "google_iam_policy" "project" {
     members = concat(var.superusers.names, var.core.administrators)
   }
 
-  # Project and superusers can view all resources in their project
+  # Project superusers and administrators can view all resources in their project
   binding {
     role    = "roles/viewer"
     members = concat(var.superusers.names, var.core.administrators)

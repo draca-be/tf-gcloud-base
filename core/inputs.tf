@@ -14,12 +14,17 @@ variable "folder" {
   default     = "core"
 }
 
-variable "name" {
+variable "core-name" {
   type        = string
   description = "The name of the core project. (default: $${var.unique-id}-core)"
   default     = null
 }
 
+variable "network-name" {
+  type = string
+  description = "The name of the network project. (default: $${var.unique-id}-network)"
+  default     = null
+}
 variable "billing" {
   type        = string
   description = "The billing account to be set on the project."
