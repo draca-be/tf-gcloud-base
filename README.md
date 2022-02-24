@@ -50,21 +50,131 @@ migrations that need to be performed.
 ## Base configuration
 
 In [skeleton](skeleton) you can find the bare minimum configuration. You can copy the files in this directory to a new
-git repository and edit them to get started. Or you can get inspiration if you're trying to migrate an existing
-Terraform project to use this module. A base configuration requires at least:
+git repository and edit them to get started. They are designed to live in a directory on the same level as this repo.
 
-* a configured core module
+Or you can get inspiration if you're trying to migrate an existing Terraform project to use this module. The rest of
+this document presumes you are starting from an empty account with the skeleton configuration. If not, you can use this
+document as a guideline for importing existing resources.
+
+To be able to use this repository, you will need:
+
+- an organization
+- a superuser GCP account (advised to only use for bootstrapping and occasional manual fixes) 
+  - with necessary access rights on organization level
+    - Billing Account User
+    - Organization Administrator
+    - Organization Role Administrator
+    - Folder Admin
+    - Project Creator
+    - Create Service Accounts
+  - who is a verified owner of your domain. You can check it[here](https://www.google.com/webmasters/verification/home).
+- an existing billing account
+- gcloud SDK installed
+- Terraform installed (obviously)
+
+Furthermore, a base configuration requires at least a configured core module. Check [skeleton](skeleton) for an example. 
 
 ## Bootstrap
 
 Make sure you have configured at least a base configuration as described above.
 
+Log into the superuser account
+```shell
+$ gcloud auth application-default login
+```
+
+Temporarily comment out the configuration in `providers.tf` and `terraform.tf`.
+
+If you haven't done so yet, make sure you initialize terraform
+
+```shell
+$ terraform init
+```
+
+Now run a targeted apply, this will only create the absolute minimum necessary to proceed
+
+```shell
+$ terraform apply -target=module.core.null_resource.bootstrap
+```
+
+This should work with the granted rights on the superuser account. If it fails it is most likely a permission problem,
+please report back with a bug report your findings.
+
+You can now uncomment the configuration in `providers.tf` and `terraform.tf`. 
+
+Next, make sure you are logged in with your regular Google account.
+
+```shell
+$ gcloud auth application-default login
+```
+
+Run terraform init again, it will offer you to migrate the existing local state into the cloud, confirm with yes.
+
+```shell
+$ terraform init
+Initializing modules...
+
+Initializing the backend...
+Do you want to copy existing state to the new backend?
+  Pre-existing state was found while migrating the previous "local" backend to the
+  newly configured "gcs" backend. No existing state was found in the newly
+  configured "gcs" backend. Do you want to copy this state to the new "gcs"
+  backend? Enter "yes" to copy and "no" to start with an empty state.
+
+  Enter a value: yes
+```
+
+Remove the local .tfstate files
+```shell
+$ rm terraform.tfstate*
+```
+
+Try running the targeted apply again, nothing should change.
+```shell
+$ terraform apply -target=null_resource.bootstrap
+```
+
+Add the email of the core service account that was created to the list of verified domain owners 
+[here](https://www.google.com/webmasters/verification/home).
+
+Now run a full apply
+```shell
+terraform apply
+```
+
+After the initial project has been set up you might want to strip away some rights on organization level, depending on 
+your use case.
+- For the superuser account in theory you only need to leave the Organization Administrator permissions so that you 
+  always have a way to manually recover Terraform issues in case of emergency. Keep in mind that this permission allows
+  anyone with access to the superuser account to elevate the rights of the superuser (or any other user).
+- For the organization by default Google allows project and billing account creation by any user that is logged in. You
+  might want to remove this since it allows anyone to bypass your infrastructure management.
+
 ## Configuration
 ### module core
 
 ```hcl
+module "core" {
+  source = "../gcloud-base/core"
 
+  organization-id = "<numerical google organization id>"
+  unique-id       = "example"
+  administrators      = ["user:admin@example.com"]
+  billing         = "ABC-123"
+  state           = {
+    domain   = "example.com"
+    location = "EUROPE-WEST1"
+  }
+}
 ```
+
+- `organization-id`: get this from the Google Cloud Console
+- `unique-id`: a string that is used in naming schemes etc, you can for example use your company name
+- `administrators`: a list of administrator accounts, the people that can execute this script
+- `billing`: the billing account to use for the core project
+- `state`
+  - `domain`: the domain name linked to your organization
+  - `location`: where data of the core project is hosted
 
 # Contributing
 

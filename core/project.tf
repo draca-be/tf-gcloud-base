@@ -1,7 +1,10 @@
 module "project" {
   depends_on = [
     # Make sure the viewer role exists
-    google_organization_iam_custom_role.viewer
+    google_organization_iam_custom_role.viewer,
+    # Make sure policies are applied
+    google_org_policy_policy.default-network,
+    google_org_policy_policy.default-service-accounts-iam,
   ]
 
   source = "../project"
