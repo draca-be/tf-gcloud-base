@@ -74,3 +74,15 @@ resource "google_organization_iam_member" "roles" {
   role   = "roles/iam.organizationRoleAdmin"
   member = "serviceAccount:${module.project.service_account}"
 }
+
+resource "null_resource" "bootstrap" {
+  depends_on = [
+    google_organization_iam_member.roles,
+    google_organization_iam_member.project-mover,
+    google_organization_iam_member.project-creator,
+    google_organization_iam_member.policy,
+    google_organization_iam_member.organization,
+    google_organization_iam_member.folder,
+    google_organization_iam_member.billing,
+  ]
+}
