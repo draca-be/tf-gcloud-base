@@ -25,3 +25,7 @@ output "roles" {
 output "folder" {
   value = module.folder.name
 }
+
+output "network" {
+  value = module.network.project
+}

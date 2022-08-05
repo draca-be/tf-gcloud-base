@@ -20,6 +20,17 @@ resource "google_org_policy_policy" "default-service-accounts-iam" {
   }
 }
 
+resource "google_org_policy_policy" "restrict-lien-removal" {
+  name   = "organizations/${var.organization-id}/policies/compute.restrictXpnProjectLienRemoval"
+  parent = "organizations/${var.organization-id}"
+
+  spec {
+    rules {
+      enforce = "TRUE"
+    }
+  }
+}
+
 # On organization level we do not set policy or use bindings as we could lock ourselves out.
 # Manual cleanup might be required.
 resource "google_organization_iam_member" "billing" {

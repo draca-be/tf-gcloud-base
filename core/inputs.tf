@@ -25,6 +25,17 @@ variable "network-name" {
   description = "The name of the network project. (default: $${var.unique-id}-network)"
   default     = null
 }
+
+variable "subnets" {
+  type = list(object({
+    name   = string
+    cidr   = string
+    region = string
+  }))
+  description = "The VPC subnets to create"
+  default     = []
+}
+
 variable "billing" {
   type        = string
   description = "The billing account to be set on the project."

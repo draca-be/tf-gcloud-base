@@ -13,12 +13,23 @@ variable "billing" {
   description = "The billing account to use for the project"
 }
 
+variable "subnets" {
+  type = list(object({
+    name   = string
+    cidr   = string
+    region = string
+  }))
+  description = "The VPC subnets to attach the project to"
+  default     = []
+}
+
 variable "core" {
   type = object({
     project         = string
     service_account = string
-    organization-id    = string
+    organization-id = string
     administrators  = list(string)
+    network         = string
     state           = object({
       domain   = string
       location = string
@@ -56,7 +67,7 @@ variable "users" {
     roles = list(string)
   }))
 
-  default = []
+  default     = []
   description = "A list of regular users and additional roles they have int he project"
 }
 
@@ -66,7 +77,7 @@ variable "google-service-accounts" {
     role = string
   }))
 
-  default = []
+  default     = []
   description = "A list of (auto-created by Google) service accounts needed by some services"
 }
 
@@ -77,6 +88,6 @@ variable "service-accounts" {
     impersonate = list(string)
   }))
 
-  default = []
+  default     = []
   description = "A list of extra service accounts to create, their roles and who can impersonate them."
 }

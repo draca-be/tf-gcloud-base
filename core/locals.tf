@@ -11,5 +11,6 @@ locals {
     administrators  = var.administrators
     state           = var.state
     roles           = local.roles
+    network         = ""
   }
 }

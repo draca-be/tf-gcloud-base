@@ -28,6 +28,12 @@ data "google_iam_policy" "project" {
     members = concat(var.superusers.names, var.core.administrators)
   }
 
+  # The core account can manage the network
+  binding {
+    role    = "roles/compute.networkAdmin"
+    members = ["serviceAccount:${var.core.service_account}"]
+  }
+
   # Project superusers and administrators can view all resources in their project
   binding {
     role    = "roles/viewer"
