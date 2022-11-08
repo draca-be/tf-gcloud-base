@@ -7,6 +7,8 @@ resource "google_organization_iam_custom_role" "viewer" {
   permissions = [
     "storage.buckets.get",
     "storage.buckets.getIamPolicy",
+    "artifactregistry.repositories.get",
+    "artifactregistry.repositories.list",
   ]
 }
 
