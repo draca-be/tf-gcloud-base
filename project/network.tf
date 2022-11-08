@@ -14,7 +14,7 @@ resource "google_org_policy_policy" "network" {
     rules {
       values {
         allowed_values = [
-          "projects/${var.core.network}/regions/${var.subnets[0].region}/subnetworks/${var.subnets[0].name}"
+        for subnet in var.subnets : "projects/${var.core.network}/regions/${subnet.region}/subnetworks/${subnet.name}"
         ]
       }
     }
